@@ -40,7 +40,7 @@ public class CardServiceTest {
     }
 
     @Test
-    void checkBalance() {
+    void testCheckBalance() {
         Card card = new Card(1L, "1234", 1L, TestUtil.getHash("0000"));
         when(cardsDao.getCardByNumber(anyString())).thenReturn(card);
         when(accountService.checkBalance(1L)).thenReturn(new BigDecimal(1000));
@@ -50,7 +50,7 @@ public class CardServiceTest {
     }
 
     @Test
-    void getMoney() {
+    void testGetMoney() {
         ArgumentCaptor<BigDecimal> amountCaptor = ArgumentCaptor.forClass(BigDecimal.class);
         ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
 
@@ -68,11 +68,17 @@ public class CardServiceTest {
     }
 
     @Test
-    void putMoney() {
+    void testPutMoney() {
+        when(cardsDao.getCardByNumber("1111"))
+                .thenReturn(new Card(1L, "1111", 100L, TestUtil.getHash("0000")));
+        when(accountService.putMoney(anyLong(), any(BigDecimal.class)))
+                .thenReturn(BigDecimal.valueOf(10000));
+
+        assertEquals(BigDecimal.valueOf(10000), cardService.putMoney("1111", "0000", BigDecimal.valueOf(100)));
     }
 
     @Test
-    void checkIncorrectPin() {
+    void testCheckIncorrectPin() {
         Card card = new Card(1L, "1234", 1L, "0000");
         when(cardsDao.getCardByNumber(eq("1234"))).thenReturn(card);
 
@@ -80,5 +86,15 @@ public class CardServiceTest {
             cardService.getBalance("1234", "0012");
         });
         assertEquals(thrown.getMessage(), "Pincode is incorrect");
+    }
+
+    @Test
+    public void testChangePing() {
+        Card card = new Card(1L, "1234", 1L, "1111");
+        when(cardsDao.getCardByNumber(eq("1234"))).thenReturn(card);
+        when(cardsDao.saveCard(any())).thenReturn(card);
+
+        cardService.changePin("1234", "0000", "1111");
+        assertEquals("1111", card.getPinCode());
     }
 }

@@ -13,15 +13,12 @@ import java.util.List;
 
 public class CashMachineServiceImpl implements CashMachineService {
 
-    private CardService cardService;
+    private final CardService cardService;
 
-    private AccountService accountService;
-
-    private MoneyBoxService moneyBoxService;
+    private final MoneyBoxService moneyBoxService;
 
     public CashMachineServiceImpl(final CardService cardService, final AccountService accountService, final MoneyBoxService moneyBoxService) {
         this.cardService = cardService;
-        this.accountService = accountService;
         this.moneyBoxService = moneyBoxService;
     }
 
@@ -61,6 +58,6 @@ public class CashMachineServiceImpl implements CashMachineService {
 
     @Override
     public boolean changePin(String cardNum, String oldPin, String newPin) {
-        return cardService.cnangePin(cardNum, oldPin, newPin);
+        return cardService.changePin(cardNum, oldPin, newPin);
     }
 }
